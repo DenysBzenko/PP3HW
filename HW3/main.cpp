@@ -2,42 +2,45 @@
 #include <string>
 #include <cstring>
 
-char* encrypt(char* rawText, int key) {
-    int length = strlen(rawText);
-    char* encryptedText = new char[length + 1];
+extern "C"
+{
 
-    for (int i = 0; i < length; i++) {
-        if (isalpha(rawText[i])) {
-            char shift = islower(rawText[i]) ? 'a' : 'A';
-            encryptedText[i] = ((rawText[i] - shift + key) % 26 + 26) % 26 + shift; 
+    __declspec(dllexport) char* encrypt(char* rawText, int key) {
+        int length = strlen(rawText);
+        char* encryptedText = new char[length + 1];
+
+        for (int i = 0; i < length; i++) {
+            if (isalpha(rawText[i])) {
+                char shift = islower(rawText[i]) ? 'a' : 'A';
+                encryptedText[i] = ((rawText[i] - shift + key) % 26 + 26) % 26 + shift;
+            }
+            else {
+
+                encryptedText[i] = rawText[i];
+            }
         }
-        else {
-            
-            encryptedText[i] = rawText[i];
-        }
+
+        encryptedText[length] = '\0';
+        return encryptedText;
     }
+    __declspec(dllexport) char* decrypt(char* encryptedText, int key) {
+        int length = strlen(encryptedText);
+        char* decryptedText = new char[length + 1];
 
-    encryptedText[length] = '\0'; 
-    return encryptedText;
-}
+        for (int i = 0; i < length; i++) {
+            if (isalpha(encryptedText[i])) {
+                char shift = islower(encryptedText[i]) ? 'a' : 'A';
+                decryptedText[i] = ((encryptedText[i] - shift - key + 26) % 26 + 26) % 26 + shift;
+            }
+            else {
 
-char* decrypt(char* encryptedText, int key) {
-    int length = strlen(encryptedText);
-    char* decryptedText = new char[length + 1];
-
-    for (int i = 0; i < length; i++) {
-        if (isalpha(encryptedText[i])) {
-            char shift = islower(encryptedText[i]) ? 'a' : 'A';
-            decryptedText[i] = ((encryptedText[i] - shift - key + 26) % 26 + 26) % 26 + shift;
+                decryptedText[i] = encryptedText[i];
+            }
         }
-        else {
 
-            decryptedText[i] = encryptedText[i];
-        }
+        decryptedText[length] = '\0';
+        return decryptedText;
     }
-
-    decryptedText[length] = '\0';
-    return decryptedText;
 }
 
 int main() {
